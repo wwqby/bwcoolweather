@@ -1,4 +1,4 @@
-package android.bwcoolweather.com.bwcoolweather;
+package com.bwcoolweather.android;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
