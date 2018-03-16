@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.bwcoolweather.android.gson.Weather;
@@ -15,7 +16,6 @@ import com.bwcoolweather.android.util.HttpUtil;
 import com.bwcoolweather.android.util.Utilty;
 
 import java.io.IOException;
-import java.util.prefs.Preferences;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -30,6 +30,7 @@ public class AutoUpdateService extends Service {
         return null;
     }
 
+    private static final String TAG = "AutoUpdateService";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         updateWeather();
@@ -54,7 +55,7 @@ public class AutoUpdateService extends Service {
             Weather weather= Utilty.handleWeatherResponse(weatherString);
             String weatherId=weather.basic.weatherId;
             String weatherUrl="http://guolin.tech/api/weather?cityid="+weatherId+"&key=a6792123c02748f39c1dca8c9adaadaa";
-            HttpUtil.sendOkHttpRequest(weatherId, new Callback() {
+            HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     e.printStackTrace();
@@ -98,5 +99,11 @@ public class AutoUpdateService extends Service {
             }
         });
 
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
+        super.onDestroy();
     }
 }
