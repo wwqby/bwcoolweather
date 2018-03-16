@@ -1,16 +1,20 @@
 package com.bwcoolweather.android;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -20,6 +24,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bwcoolweather.android.gson.Forecast;
 import com.bwcoolweather.android.gson.Weather;
+import com.bwcoolweather.android.service.AutoUpdateService;
 import com.bwcoolweather.android.util.HttpUtil;
 import com.bwcoolweather.android.util.Utilty;
 
@@ -46,8 +51,10 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView carWashText;
     private TextView sportText;
     private ImageView bingPicImg;
-    private String mWeatherId;
+    public  String mWeatherId;
     public SwipeRefreshLayout swipeRefresh;
+    public DrawerLayout drawerLayout;
+    private Button navButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +80,19 @@ public class WeatherActivity extends AppCompatActivity {
         sportText=(TextView)findViewById(R.id.sport_text);
         bingPicImg=(ImageView)findViewById(R.id.bing_pic_img);
         swipeRefresh=(SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
+        drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
+        navButton=(Button)findViewById(R.id.nav_button);
 
         //设置刷新条颜色
         swipeRefresh.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
 
+        //设置滑动菜单
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString =prefs.getString("weather",null);
         String bingPic=prefs.getString("bing_pic",null);
@@ -198,6 +214,10 @@ public class WeatherActivity extends AppCompatActivity {
         comfortText.setText(comfort);
         carWashText.setText(carWash);
         sportText.setText(sport);
+
+        //启动后台更新服务
+        Intent intent=new Intent(this, AutoUpdateService.class);
+        startService(intent);
 
         weatherLayout.setVisibility(View.VISIBLE);
     }
